@@ -100,10 +100,20 @@ class _TwitterState extends State<Twitter> {
       account: "@Bu1916_10",
     ),
   ];
-
-  var tweetShow = [];
-
-  int counter = 0;
+  callback(String text) {
+    setState(() {
+      tweetList.insert(
+        0,
+        Tweet(
+          avatar_url:
+              'https://cdn.icon-icons.com/icons2/1839/PNG/512/womanglasses18_116013.png',
+          postText: text,
+          name: "Tha.putt",
+          account: "@Bu1916_10",
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,10 +150,14 @@ class _TwitterState extends State<Twitter> {
       floatingActionButton: FloatingActionButton(
         child: Icon(FontAwesomeIcons.pen),
         onPressed: () {
-          setState(() {
-            tweetShow.insert(0, tweetList[counter]);
-            counter++;
-          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewTweet(
+                callback: this.callback,
+              ),
+            ),
+          );
         },
       ),
     );
@@ -154,12 +168,12 @@ class _TwitterState extends State<Twitter> {
       color: Colors.white,
       child: ListView.separated(
           itemBuilder: (BuildContext context, int index) {
-            return tweetShow[index];
+            return tweetList[index];
           },
           separatorBuilder: (BuildContext context, int index) => const Divider(
                 height: 10,
               ),
-          itemCount: tweetShow.length),
+          itemCount: tweetList.length),
     );
   }
 
@@ -167,6 +181,63 @@ class _TwitterState extends State<Twitter> {
     return IconButton(
       icon: Icon(icon, color: color),
       onPressed: () {},
+    );
+  }
+}
+
+class NewTweet extends StatelessWidget {
+  final ValueChanged<String> callback;
+  TextEditingController tweetController = TextEditingController();
+  NewTweet({required this.callback});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: "New Tweet",
+      theme: ThemeData(
+        primaryColor: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          elevation: 1,
+          title: Text(
+            "New Tweet",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          leading: Container(
+            margin: EdgeInsets.all(10.0),
+            child: CircleAvatar(
+                backgroundImage: NetworkImage(
+                    "https://images.unsplash.com/photo-1512078083908-46520ff2a87d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80")),
+          ),
+        ),
+        body: Column(
+          children: [
+            TextField(
+              controller: tweetController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: "What's happenning",
+                hintStyle: TextStyle(color: Colors.grey.shade400),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                callback(tweetController.text);
+                Navigator.pop(context);
+              },
+              child: Text("Tweet"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
